@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,8 @@ public class CustomerService {
         return customerRepository.findAll();
     }
 
-    public Customer getCustomerById(String id){
-        return customerRepository.findById(id).orElse(null);
+    public Optional<Customer> getCustomerById(String id){
+        return customerRepository.findById(id);
     }
 
     public Customer addCustomer(Customer customer){
@@ -31,5 +32,19 @@ public class CustomerService {
 
     public void deleteCustomer(String id){
         customerRepository.deleteById(id);
+    }
+
+    public Optional<Customer> updateCustomer(Customer customer, String id) {
+        Optional<Customer> existingCustomer = this.getCustomerById(id);
+        if(existingCustomer.isPresent()) {
+            existingCustomer.get().setName(customer.getName());
+            existingCustomer.get().setEmail(customer.getEmail());
+            existingCustomer.get().setPassword(customer.getPassword());
+            existingCustomer.get().setProductIds(customer.getProductIds());
+
+            customerRepository.save(existingCustomer.get());
+            return existingCustomer;
+        }
+        return existingCustomer;
     }
 }
